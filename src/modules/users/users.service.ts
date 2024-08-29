@@ -113,8 +113,6 @@ export class UsersService {
     //hash password
     const hasPassword = await hasPasswordHelper(password);
 
-    dayjs('2018-08-08');
-
     //create user
     const user = await this.userModel.create({
       name,

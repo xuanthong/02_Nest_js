@@ -5,11 +5,14 @@ import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from '@/decorator/customize';
 import { CreateAuthDto } from './dto/create-auth.dto';
-// import { Public } from '@/decorator/customize';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly mailerService: MailerService
+    ) {}
 
   // @Post("login")
   // create(@Body() createAuthDto: CreateAuthDto) {
@@ -36,5 +39,21 @@ export class AuthController {
   @Public()
   register(@Body() registerDto: CreateAuthDto) {
     return this.authService.handleRegister(registerDto);
+  }
+
+  @Get('mail')
+  @Public()
+  testMail() {
+    this.mailerService
+    .sendMail({
+      to: 'thong.nguyenn56test@tmi-soft.vn', // list of receivers
+      subject: 'Testing Nest MailerModule ✔', // Subject line
+      text: 'welcome', // plaintext body
+      html: '<b>welcome</b>', // HTML body content
+    })
+    .then(() => {})
+    .catch(() => {});
+
+    return "ok1";
   }
 }
