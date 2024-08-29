@@ -46,10 +46,15 @@ export class AuthController {
   testMail() {
     this.mailerService
     .sendMail({
-      to: 'thong.nguyenn56test@tmi-soft.vn', // list of receivers
+      to: 'thong.nguyenn56@tmi-soft.vn', // list of receivers
       subject: 'Testing Nest MailerModule ✔', // Subject line
       text: 'welcome', // plaintext body
-      html: '<b>welcome</b>', // HTML body content
+      // html: '<b>welcome</b>', // HTML body content
+      template:'register',
+      context: {
+        name: "Eric",
+        activationCode: "1234"
+      }
     })
     .then(() => {})
     .catch(() => {});

@@ -8,13 +8,16 @@ import { hasPasswordHelper } from '@/helpers/util';
 import aqp from 'api-query-params';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
-import * as dayjs from 'dayjs'
+import * as dayjs from 'dayjs';
+import { MailerService } from '@nestjs-modules/mailer';
+
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<User>,
+    private readonly mailerService: MailerService,
   ) {}
 
   isEmailExist = async (email: string) => {
@@ -113,14 +116,28 @@ export class UsersService {
     //hash password
     const hasPassword = await hasPasswordHelper(password);
 
+    const codeId = uuidv4();
     //create user
     const user = await this.userModel.create({
       name,
       email,
       password: hasPassword,
       isActive: false,
-      codeId: uuidv4(),
-      codeExpired: dayjs().add(15,'minute'), // new date + 1 minute
+      codeId: codeId,
+      codeExpired: dayjs().add(15,'minute'),
+    });
+
+    //send email
+    this.mailerService.sendMail({
+      to: user.email, // list of receivers
+      subject: 'Activate your account at account !', // Subject line
+      text: 'welcome', // plaintext body
+      // html: '<b>welcome</b>', // HTML body content
+      template:'register',
+      context: {
+        name:  user?.name ?? user.email,
+        activationCode: codeId
+      }
     });
 
     //send response to user
@@ -128,7 +145,7 @@ export class UsersService {
       _id: user._id
     }
 
-   //send email
+   
 
   }
 }
